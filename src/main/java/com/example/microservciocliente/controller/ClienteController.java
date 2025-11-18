@@ -54,14 +54,14 @@ public class ClienteController {
         try {
             Cliente cli = clienteService.encontrarClienteId(id);
             cli.setId(id);
-            cli.setNombre(cli.getNombre());
-            cli.setRut(cli.getRut());
-            cli.setCorreo(cli.getCorreo());
-            cli.setContrasenia(cli.getContrasenia());
-            cli.setTelefono(cli.getTelefono());
-            cli.setFechaNacimiento(cli.getFechaNacimiento());
-            cli.setRegion(cli.getRegion());
-            cli.setComuna(cli.getComuna());
+            cli.setNombre(cliente.getNombre());
+            cli.setRut(cliente.getRut());
+            cli.setCorreo(cliente.getCorreo());
+            cli.setContrasenia(cliente.getContrasenia());
+            cli.setTelefono(cliente.getTelefono());
+            cli.setFechaNacimiento(cliente.getFechaNacimiento());
+            cli.setRegion(cliente.getRegion());
+            cli.setComuna(cliente.getComuna());
 
             clienteService.guardar(cli);
             return ResponseEntity.ok(cliente);

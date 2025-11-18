@@ -10,7 +10,7 @@ import com.example.microservciocliente.model.Cliente;
 import com.example.microservciocliente.services.ClienteService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
 @RestController
-@RequestMapping("/api/v1/books")
+@RequestMapping("/api/v1/clientes")
 @Tag(name = "Gestion clientes", description = "Operaciones para gestionar clientes")
 public class ClienteController {
     
@@ -56,11 +56,11 @@ public class ClienteController {
             existingCliente.setNombre(cliente.getNombre());
             existingCliente.setRut(cliente.getRut());
             existingCliente.setCorreo(cliente.getCorreo());
-            existingCliente.setComuna(cliente.getComuna());
             existingCliente.setContrasenia(cliente.getContrasenia());
             existingCliente.setTelefono(cliente.getTelefono());
             existingCliente.setRegion(cliente.getRegion());
             existingCliente.setComuna(cliente.getComuna());
+            existingCliente.setFechaNacimiento(cliente.getFechaNacimiento());
             return clienteService.saveCliente(existingCliente);
         }
         return null;

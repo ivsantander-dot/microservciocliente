@@ -3,73 +3,80 @@ package com.example.microservciocliente.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.microservciocliente.model.Cliente;
 import com.example.microservciocliente.services.ClienteService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.web.bind.annotation.RequestBody;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-
-
-
-
 @RestController
 @RequestMapping("/api/v1/clientes")
-@Tag(name = "Gestion clientes", description = "Operaciones para gestionar clientes")
 public class ClienteController {
-    
+
     @Autowired
     private ClienteService clienteService;
-
-    @GetMapping
-    @Operation(summary = "Ver lista de clientes registrados", description = "Obtiene todos los clientes almacenados")
-    public List<Cliente> getAllClientes() {
-        return clienteService.getAllClientes();
-    }
     
-    @GetMapping("/{id}")
-    @Operation(summary = "Obtener cliente por ID", description = "Devuelve un libro segun su ID")
-    public Cliente getClienteById(@PathVariable Long id) {
-        return clienteService.getClienteById(id);
+    @GetMapping
+    public ResponseEntity<List<Cliente>> listar() {
+        List<Cliente> clientes = clienteService.listarClientes();
+        if (clientes.isEmpty()){
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(clientes);
     }
 
-    @PostMapping()
-    @Operation(summary = "Agregar un nuevo cliente",  description = "Crea un nuevo cliente")
-    public Cliente createCliente(@RequestBody Cliente cliente) {
-        return clienteService.saveCliente(cliente);
+    @PostMapping
+    public ResponseEntity<Cliente> guardar(@RequestBody Cliente cliente){
+        Cliente clienteNuevo = clienteService.guardar(cliente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(clienteNuevo);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Cliente> buscar(@PathVariable Integer id){
+        try {
+            Cliente cliente = clienteService.encontrarClienteId(id);
+            return ResponseEntity.ok(cliente);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar un cliente existente", description = "Modifica los datos de un cliente por su ID")
-    public Cliente updaCliente(@PathVariable Long id, @RequestBody Cliente cliente) {
-        Cliente existingCliente = clienteService.getClienteById(id);
-        if (existingCliente != null) {
-            existingCliente.setNombre(cliente.getNombre());
-            existingCliente.setRut(cliente.getRut());
-            existingCliente.setCorreo(cliente.getCorreo());
-            existingCliente.setContrasenia(cliente.getContrasenia());
-            existingCliente.setTelefono(cliente.getTelefono());
-            existingCliente.setRegion(cliente.getRegion());
-            existingCliente.setComuna(cliente.getComuna());
-            existingCliente.setFechaNacimiento(cliente.getFechaNacimiento());
-            return clienteService.saveCliente(existingCliente);
+    public ResponseEntity<Cliente> actualizar(@PathVariable Integer id, @RequestBody Cliente cliente){
+        try {
+            Cliente cli = clienteService.encontrarClienteId(id);
+            cli.setId(id);
+            cli.setNombre(cli.getNombre());
+            cli.setRut(cli.getRut());
+            cli.setCorreo(cli.getCorreo());
+            cli.setContrasenia(cli.getContrasenia());
+            cli.setTelefono(cli.getTelefono());
+            cli.setFechaNacimiento(cli.getFechaNacimiento());
+            cli.setRegion(cli.getRegion());
+            cli.setComuna(cli.getComuna());
+
+            clienteService.guardar(cli);
+            return ResponseEntity.ok(cliente);
+        } catch(Exception e) {
+            return ResponseEntity.notFound().build();
         }
-        return null;
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Elimina un cliente", description = "Elimina un cliente por su ID")
-    public void deleteCliente(@PathVariable Long id) {
-        clienteService.deleteCliente(id);
+    public ResponseEntity<?> eliminar(@PathVariable Long id){
+        try {
+            clienteService.borrar(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
-    
 }

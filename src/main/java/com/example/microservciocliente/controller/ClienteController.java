@@ -24,7 +24,7 @@ public class ClienteController {
     @Autowired
     private ClienteService clienteService;
     
-    @GetMapping
+    @GetMapping("/admin/getUsuarios")
     public ResponseEntity<List<Cliente>> listar() {
         List<Cliente> clientes = clienteService.listarClientes();
         if (clientes.isEmpty()){
@@ -33,13 +33,13 @@ public class ClienteController {
         return ResponseEntity.ok(clientes);
     }
 
-    @PostMapping
+    @PostMapping("/crearUsuarios")
     public ResponseEntity<Cliente> guardar(@RequestBody Cliente cliente){
         Cliente clienteNuevo = clienteService.guardar(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteNuevo);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/admin/getUsuariosId/{id}")
     public ResponseEntity<Cliente> buscar(@PathVariable Integer id){
         try {
             Cliente cliente = clienteService.encontrarClienteId(id);
@@ -49,7 +49,7 @@ public class ClienteController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/admin/actualizarUsuario/{id}")
     public ResponseEntity<Cliente> actualizar(@PathVariable Integer id, @RequestBody Cliente cliente){
         try {
             Cliente cli = clienteService.encontrarClienteId(id);
@@ -70,7 +70,7 @@ public class ClienteController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/eliminarUsuario/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id){
         try {
             clienteService.borrar(id);

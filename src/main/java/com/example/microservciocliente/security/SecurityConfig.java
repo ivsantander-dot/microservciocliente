@@ -1,5 +1,6 @@
 package com.example.microservciocliente.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
+
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;  
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -26,23 +30,33 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    http.csrf(csrf -> csrf.disable());
+        http.csrf(csrf -> csrf.disable());
 
-    http.authorizeHttpRequests(auth -> auth
-            // endpoints públicos
-            .requestMatchers("/auth/login", "/auth/register").permitAll()
-            // Swagger y OpenAPI
-            .requestMatchers(
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html").permitAll()
-            .requestMatchers("/api/v1/clientes/admin/**").hasRole("ADMIN")
-            .requestMatchers("/api/v1/clientes/**").authenticated()  
-            .anyRequest().authenticated()
-    );
+        http.authorizeHttpRequests(auth -> auth
 
-    http.addFilterBefore(new JwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+                .requestMatchers("/auth/login", "/auth/register").permitAll()
 
-    return http.build();
-}
+                .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                ).permitAll()
+
+                .requestMatchers("/h2-console/**").permitAll()
+
+                .requestMatchers("/api/v1/clientes/admin/**").hasRole("ADMIN")
+
+                .requestMatchers("/api/v1/clientes/**").authenticated()
+
+                .anyRequest().authenticated()
+        );
+
+        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
+
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
 }

@@ -17,14 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.microservciocliente.model.Cliente;
 import com.example.microservciocliente.services.ClienteService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/v1/clientes")
+@Tag(name = "Cliente", description = "Endpoints de cliente")
 public class ClienteController {
 
     @Autowired
     private ClienteService clienteService;
     
     @GetMapping("/admin/getUsuarios")
+    @Operation(summary = "Obtiene todos los usuarios", description = "Requiere rol ADMIN")
     public ResponseEntity<List<Cliente>> listar() {
         List<Cliente> clientes = clienteService.listarClientes();
         if (clientes.isEmpty()){
@@ -33,12 +38,14 @@ public class ClienteController {
         return ResponseEntity.ok(clientes);
     }
 
+    @Operation(summary = "Crea usuario", description = "No requiere rol")
     @PostMapping("/crearUsuarios")
     public ResponseEntity<Cliente> guardar(@RequestBody Cliente cliente){
         Cliente clienteNuevo = clienteService.guardar(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteNuevo);
     }
 
+    @Operation(summary = "Obtiene usuarios por id", description = "Requiere rol ADMIN")
     @GetMapping("/admin/getUsuariosId/{id}")
     public ResponseEntity<Cliente> buscar(@PathVariable Integer id){
         try {
@@ -49,7 +56,9 @@ public class ClienteController {
         }
     }
 
+    
     @PutMapping("/admin/actualizarUsuario/{id}")
+    @Operation(summary = "Actualiza usuarios", description = "Requiere rol ADMIN")
     public ResponseEntity<Cliente> actualizar(@PathVariable Integer id, @RequestBody Cliente cliente){
         try {
             Cliente cli = clienteService.encontrarClienteId(id);
@@ -62,6 +71,7 @@ public class ClienteController {
             cli.setFechaNacimiento(cliente.getFechaNacimiento());
             cli.setRegion(cliente.getRegion());
             cli.setComuna(cliente.getComuna());
+            cli.setRole(cliente.getRole());
 
             clienteService.guardar(cli);
             return ResponseEntity.ok(cliente);
@@ -71,6 +81,7 @@ public class ClienteController {
     }
 
     @DeleteMapping("/admin/eliminarUsuario/{id}")
+    @Operation(summary = "Elimina usuarios", description = "Requiere rol ADMIN")
     public ResponseEntity<?> eliminar(@PathVariable Long id){
         try {
             clienteService.borrar(id);

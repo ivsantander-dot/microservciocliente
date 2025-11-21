@@ -26,16 +26,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable());
+    http.csrf(csrf -> csrf.disable());
 
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login", "/auth/register").permitAll()        // público
-                .requestMatchers("/admin/**").hasRole("ADMIN")                     // solo ADMIN
-                .anyRequest().authenticated()                                      // todo lo demás requiere token
-        );
+    http.authorizeHttpRequests(auth -> auth
+            // endpoints públicos
+            .requestMatchers("/auth/login", "/auth/register").permitAll()
+            // Swagger y OpenAPI
+            .requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/api/v1/clientes/crearUsuarios"
+            ).permitAll()
+            .requestMatchers("/admin/**").hasRole("ADMIN")
+            .anyRequest().authenticated()
+    );
 
-        http.addFilterBefore(new JwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(new JwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+}
 }

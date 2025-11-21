@@ -40,7 +40,7 @@ public class AuthService {
         cliente.setCorreo(request.getUsername());
         cliente.setContrasenia(passwordEncoder.encode(request.getPassword()));
         cliente.setNombre("Nuevo Usuario");
-        cliente.setRut("00000000-0");
+        cliente.setRut(request.getUsername());
         cliente.setRegion("N/A");
         cliente.setComuna("N/A");
         cliente.setTelefono("N/A");
